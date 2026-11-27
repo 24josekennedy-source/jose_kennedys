@@ -1,0 +1,196 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jose's Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <a class="brand" href="#">Portfolio <span>Jose</span></a>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#about">About Me</a></li>
+                <li><a href="#projects">Project</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="https://www.reddit.com/r/cats/" target="_blank" rel="noopener noreferrer">Cats</a></li>
+            </ul>
+        </nav>
+        <button>Hire me</button>
+    </header>
+
+    <main class="about-section" id="about">
+        <h1>About Me</h1>
+        <div class="about-frame">
+            <div class="about-copy">
+                <h2>Hello, I'm Jose</h2>
+                <p>I'm a student who enjoys learning, creating, and exploring new ideas. This portfolio is where I share my projects and the things I'm working on.</p>
+                <p>I like taking an idea and building it into something I can share. Each project gives me a chance to practice, try new things, and learn from the process.</p>
+                <p>Thanks for visiting my portfolio. Take a look around and explore what I've been working on!</p>
+            </div>
+            <div class="about-box">
+                <img src="assets/51f8cdd3610805a6f0a3e645f60942b3.jpg" alt="Jose standing beside a friend">
+            </div>
+        </div>
+    </main>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jose's Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+             
+    <section class="projects-section" id="projects">
+        <h2>My Projects</h2>
+        <div class="project-grid">
+            <article class="project-card">
+                <img class="project-photo" src="assets/fungus-illustration.svg" alt="Illustration of mushrooms growing in a forest clearing">
+                <code class="project-code">&lt;project_01&gt;</code>
+                <h3>Project 1</h3>
+                <label class="picture-upload" for="project-picture-1">Choose picture</label>
+                <input class="picture-input" id="project-picture-1" type="file" accept="image/*">
+            </article>
+            <article class="project-card">
+                <img class="project-photo" alt="Project 2 picture" hidden>
+                <code class="project-code">&lt;project_02&gt;</code>
+                <h3>Project 2</h3>
+                <label class="picture-upload" for="project-picture-2">Choose picture</label>
+                <input class="picture-input" id="project-picture-2" type="file" accept="image/*">
+            </article>
+            <article class="project-card">
+                <img class="project-photo" alt="Project 3 picture" hidden>
+                <code class="project-code">&lt;project_03&gt;</code>
+                <h3>Project 3</h3>
+                <label class="picture-upload" for="project-picture-3">Choose picture</label>
+                <input class="picture-input" id="project-picture-3" type="file" accept="image/*">
+            </article>
+        </div>
+    </section>
+    <section class="contact-section" id="contact">
+        <div class="contact-intro">
+            <h2>Want to chat or work together?</h2>
+            <p>Send me a message or reach out using one of the links below.</p>
+        </div>
+        <div class="contact-grid">
+            <div class="contact-links">
+                <a href="mailto:setnug76@email.com">Email <span> 24jose.kennedy@oel.sch.id </span></a>
+                <a href="https://www.instagram.com/porridgegoestohell/" target="_blank" rel="noopener noreferrer">Instagram <span>@porridgegoestohell</span></a>
+                <a href="https://wa.me/6281213265482" target="_blank" rel="noopener noreferrer">WhatsApp <span>Send a message</span></a>
+            </div>
+            <form class="contact-form" action="#" method="post">
+                <label for="contact-name">Name</label>
+                <input type="text" id="contact-name" name="name" required>
+                <label for="contact-email">Email</label>
+                <input type="email" id="contact-email" name="email" required>
+                <label for="contact-message">Message</label>
+                <textarea id="contact-message" name="message" rows="4" required></textarea>
+                <button type="submit">Send message</button>
+            </form>
+        </div>
+    </section>
+    <script>
+        function openPictureDatabase() {
+            return new Promise(function (resolve, reject) {
+                var request = window.indexedDB.open("jose-portfolio", 1);
+
+                request.onupgradeneeded = function () {
+                    request.result.createObjectStore("project-pictures");
+                };
+                request.onsuccess = function () {
+                    resolve(request.result);
+                };
+                request.onerror = function () {
+                    reject(request.error);
+                };
+            });
+        }
+
+        var pictureDatabase = openPictureDatabase();
+
+        function savePicture(key, picture) {
+            return pictureDatabase.then(function (database) {
+                return new Promise(function (resolve, reject) {
+                    var transaction = database.transaction("project-pictures", "readwrite");
+                    transaction.objectStore("project-pictures").put(picture, key);
+                    transaction.oncomplete = resolve;
+                    transaction.onerror = function () {
+                        reject(transaction.error);
+                    };
+                    transaction.onabort = function () {
+                        reject(transaction.error || new Error("Picture save was cancelled."));
+                    };
+                });
+            });
+        }
+
+        function loadPicture(key) {
+            return pictureDatabase.then(function (database) {
+                return new Promise(function (resolve, reject) {
+                    var request = database
+                        .transaction("project-pictures", "readonly")
+                        .objectStore("project-pictures")
+                        .get(key);
+
+                    request.onsuccess = function () {
+                        resolve(request.result);
+                    };
+                    request.onerror = function () {
+                        reject(request.error);
+                    };
+                });
+            });
+        }
+
+        function showPicture(photo, picture) {
+            if (photo.dataset.objectUrl) {
+                URL.revokeObjectURL(photo.dataset.objectUrl);
+            }
+
+            photo.dataset.objectUrl = URL.createObjectURL(picture);
+            photo.src = photo.dataset.objectUrl;
+            photo.hidden = false;
+        }
+
+        function reportPictureError(error) {
+            console.error("Could not save or load a picture.", error);
+            window.alert("A picture could not be saved or loaded in this browser.");
+        }
+
+        document.querySelectorAll(".project-card").forEach(function (card) {
+            var input = card.querySelector(".picture-input");
+            var photo = card.querySelector(".project-photo");
+
+            loadPicture(input.id).then(function (picture) {
+                if (picture) showPicture(photo, picture);
+            }).catch(reportPictureError);
+
+            input.addEventListener("change", function () {
+                var file = input.files[0];
+                if (!file) return;
+
+                if (!file.type.startsWith("image/")) {
+                    input.value = "";
+                    window.alert("Please choose an image file.");
+                    return;
+                }
+
+                savePicture(input.id, file).then(function () {
+                    showPicture(photo, file);
+                }).catch(reportPictureError);
+            });
+        });
+
+    </script>
+    <footer class="footer">
+        <strong>Jose</strong>
+        <span>&copy; 2026 Jose. Grade 9, OeL BSD Junior High School.</span>
+    </footer>
+</body>
+</html>
